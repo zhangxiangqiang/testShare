@@ -1,0 +1,1094 @@
+[toc]
+
+## 自动化测试
+
+前端自动化测试是前端工程化非常重要的一环，一般前端流行框架比如ant，redux都包含大量测试代码，自动化测试一方面是为保证代码质量，减少bug，另一方面，为以后的代码重构，提供了保障
+
+
+## 测试方案
+
+
+1. TDD ： test Driven Development 测试驱动开发 
+
+测试驱动开发就是通过编写测试用例，先考虑代码的使用需求（包括功能、过程、接口等），而且这个描述是无二义的，可执行验证的。
+
+通过编写这部分代码的测试用例，对其功能的分解、使用过程、接口都进行了设计。而且这种从使用角度对代码的设计通常更符合后期开发的需求。可测试的要求，对代码的内聚性的提高和复用都非常有益。因此测试驱动开发也是一种代码设计的过程。
+
+流程：
+> 1. 编写测试用例
+> 2. 运行测试，测试用例无法通过测试。
+> 3. 编写代码，使测试用例通过测试
+> 4. 优化代码，完成开发
+> 5. 重复上述步骤
+
+Red-Green Development 由红到绿开发
+
+优势：
+
+> 1. 长期减少回归bug（测试用例足够多，改动就会重新运行测试，及时发现bug）
+> 2. 代码质量更好（促进思考，代码组织性，模块拆分合理，可维护性）
+> 3. 测试覆盖率高。
+
+测试覆盖率高不一定好，最后几个百分点可能会耗费过多精力
+
+2. BDD : Behavior Driven Development  行为驱动开发
+
+流程： 先写代码，然后写测试，基于用户想做的事情开发，去写代码，开发完成，基于想要测试的功能点进行测试
+
+## 前端测试的分类 
+
+### 单元测试（Unit Test）
+
+ 
+
+    优点： 
+    > 测试覆盖率高，测试函数完整度高
+    
+    缺点：
+    > 在测试业务代码的时候，和业务耦合度高，和业务紧紧耦合在一起，业务（代码）改变，测试也要改
+    > 代码量高（接近1:1)
+    > 只能保证自己单元没问题，不能保证系统没问题
+    
+综上，更适合测试独立函数，越是基础的，底层的代码越是需要进行完备的单元测试
+> 就好比造房子的时候我们对每块砖的密度，重量，长宽高是否符合规范等数据进行测试，以确保每块砖都是ok的，不会出现空心砖等情况，从而保证最后造出来的房子没有安全隐患
+
+是否需要单元测试?
+
+> 1. 你写的是个util类，是会被其他类调用的那种？
+> 2. 你写的是一个公共component，是会被其他工程调用的那种？
+> 3. 你写的是一个开源项目
+
+### 集成测试（Integration Test）&& 端到端测试(End-to-End Test)
+
+和单元测试很类似
+
+单元测试是对简单的功能单元进行测试，外部引入的东西可以不测，选择mock掉（这也决定了mock特性在单元测试里的重要地位），可以提升性能及速度，如果对不仅对当前单元做了测试还能对其引入文件做了测试，就是**集成测试（Integration Test）**。
+
+
+如果这个过程模拟了一个一个完整的用户真实场景, 它就是一个**端到端测试(End-to-End Test)**，简称e2e;
+
+端到端测试(通常缩写为E2E)：
+
+> 就是利用一些工具库提供的API使用代码来模拟终端用户在UI界面上的操作
+
+Web 前端 E2E 自动化测试开展得不好。到目前为止，大部分产品的前端 E2E 测试都交给测试人员手工完成。
+
+端到端测试通常由测试部门完成, 一般有以下特性:
+
+> 需要搭建专门的测试环境模拟真实的用户场景, 成本较高
+> 测试用例复杂, 运行时间长
+> 一旦测试发现问题, 由于涉及的模块比较多, 定位问题难度较高
+
+端到端测试成本较高， 相对于人工测试效率较高，
+目前常用的工具有，selenium， puppeteer，phantom
+
+是否需要做e2e测试呢：
+
+> 1.测试团队是否兵强马壮  （基于人海战术的人肉e2e测试）
+
+> 2.产品UI是否相对不稳定，经常大改 （改e2e case都来不及）
+
+> 3.测试团队是否已经熟练掌握自动化测试技术，并已经运用起来  （QA来写e2e自动测试，理想国，前端就可以甩手了）
+
+> 4.每一个迭代周期，留给QA测试时间是否充裕  （人肉e2e测试时间充足）
+
+> 5.Service接口的测试覆盖率是否很高，后端UT的覆盖率是否很高 （底层建筑稳，隐患少）
+
+> 6.每一个迭代周期，留给前端开发的时间是否很紧张 （前端写完业务代码，也要有时间写e2e代码）
+
+团队中，如果QA资源匮乏，且UI变化的频率不是很频繁的情况下，为了提高工作效率，提升产品质量了，我们就要考虑引入是该引入e2e自动化测试了来替代一部分的QA人肉工作量。由前端来写e2e测试
+
+
+## 测试工具
+
+前端测试工具也和前端的框架一样纷繁复杂，其中常见的测试工具，大致可分为测试框架、断言库、测试覆盖率工具等几类， 
+
+### 主流测试框架
+
+jasmine, mocha(搭配chai 语法库)等， Jest 是 Facebook 出品的一个测试框架，它 在性能，功能，易用性方面做的相对较好 
+
+## jest
+
+[jest文档](https://jestjs.io/)
+
+
+jest 是一个 node 端运行的测试框架，使用了 jsdom 来模拟 DOM 环境，也是react官方推荐的测试框架。
+
+
+### 1. 安装
+
+```
+
+cnpm install --save-dev jest
+
+```
+
+### 2. 配置启动脚本
+
+
+```
+package.json
+
+{
+  "scripts": {
+    "test": "jest"
+  }
+}
+
+```
+
+### 3. 更多配置
+
+ jest --init 初始化一个jest配置文件
+
+
+npm run test 开始测试
+
+但是这样直接跑，有可能是跑不起来的，因为有些语法jest解析不了， 这时候我们需要babel的帮助
+
+### 结合babel
+
+jest 内部集成了babel-jest插件, 运行jest的时候会去检测当前环境是否安装了babel或babel-core, 如果安装了，会找.babelrc的配置， 运行测试之前，会用babel转换，使得新的js语法，esmodule，能够在node环境下运行
+
+```
+cnpm install  --save-dev jest
+
+```
+
+
+### react 配置jest 
+
+假设我们用 create-react-app 新起了一个项目， 实际上create-react-app等很多脚手架都集成了jest, 只不过被隐藏了。
+
+可以 npm run reject 把隐藏的配置暴露出来。
+
+
+create-react-app 帮我们做了上述过程：装jest及其依赖, jest --init 创建配置文件，写入基础配置；
+
+我们自己写的jest配置会覆盖默认配置；
+
+### 配置项解释
+ 
+ #### roots
+ 
+ 根目录
+ 
+ 配置jset搜索路径，jest直接写路径里搜索，要去匹配寻找的文件，不在这个路径里的就找不到
+ 
+ ```
+ roots: [
+    '<rootDir>/src/',
+  ],
+ 
+ ```
+ 
+ #### testMatch
+ 
+ 匹配测试文件
+ 
+ jest 在配置的roots里寻找，能匹配上的测试文件，运行测试
+ 
+ ```
+ testMatch: [
+    // '**/__tests__/**/*.js?(x)',
+    '**/?(*.)+(spec|test).js?(x)',
+  ],
+ 
+ ```
+ 
+ #### collectCoverageFrom
+ 
+ 从哪些文件收集覆盖率信息
+ 
+ ```
+ // Indicates whether the coverage information should be collected while executing the test
+  collectCoverage: true,  // 生成测试报告
+
+  // An array of glob patterns indicating a set of files for which coverage information should be collected
+  collectCoverageFrom: [
+    '**/routes/carousel/components/**/index.js',
+  ],
+ 
+ ```
+ 
+ 
+ #### moduleNameMapper
+ 
+ 配置别名， 处理全局文件mock
+ 
+ 
+ 一些图片样式在测试中一般没什么用，我们可以把它mock掉
+
+```
+
+
+ 
+moduleNameMapper: {
+// 处理处理全局文件mock
+  "\\.(jpg|jpeg|png|gif|mp4|webm|wav|mp3)$": "<rootDir>/__mocks__/fileMock.js",
+  "\\.(css|less)$": "<rootDir>/__mocks__/styleMock.js"
+// 处理别名
+"^react(.*)$": "<rootDir>/vendor/react-master$1",
+"^config$": "<rootDir>/configs/app-config.js"
+
+}
+
+> $1 编号的反向引用替换捕获的正则组
+  
+
+
+// __mocks__/styleMock.js
+
+module.exports = {};
+// __mocks__/fileMock.js
+
+module.exports = 'test-file-stub';
+ 
+ ```
+ 
+ #### setupFiles
+ 
+ 每个测试文件运行前，执行一次
+ 
+ 
+ 
+ #### 一些其他常用配置
+
+```
+ module.exports = {
+    testMatch: ['**/__tests__/**/*.js?(x)', '**/?(*.)(spec|test).js?(x)'],//设置识别哪些文件是测试文件（glob形式），与testRegex互斥，不能同时写
+    testRegex: '(/__tests__).*|(\\.|/)(test|spec))\\.jsx?$',//设置识别哪些文件是测试文件（正则形式），与testMatch互斥，不能同时写
+    testEnvironment: 'jsdom',//测试环境，默认值是：jsdom，可修改为node
+    rootDir: '',//默认值：当前目录，一般是package.json所在的目录。
+    moduleFileExtensions: ['js', 'json', 'jsx', 'node']//测试文件的类型
+    setupFilesAfterEnv: 
+}
+
+
+```
+ 
+ ### 命令 选项
+ 
+ 在命令行中灵活的使用jest
+ 
+ --watchAll 测试代码改变（保存）后，会重新运行所有测试用例
+ > --watch 只跑改变过的测试用例的文件
+ 
+ 然后可以，通过按键，切换不同的模式
+ 
+ f : 只跑改变过的测试用例
+ 
+ o: 只跑改变过的文件里的测试用例（需要项目被git管理起来，才能用这个模式）(类似--watch 只跑改变过的测试用例)
+ 
+ a: 跑所有的测试用例（类似--watchAll）
+ 
+ t: 根据测试用例名，（过滤）跑测试
+ 
+ p: 根据文件名（过滤）跑测试
+
+ 
+ q： 退出监控
+ 
+
+
+### 语法
+
+常规
+
+```
+const sum = require('./sum');
+
+test('adds 1 + 2 to equal 3', () => {
+  expect(sum(1, 2)).toBe(3);
+});
+
+
+```
+
+### 匹配器
+
+您应该使用匹配器最精确地对应您的代码你想要什么。
+
+expect () 返回一个"期望"的对象, 这个对象有以下匹配器方法：
+
+#### 1. toBe() : 
+
+普通值比较，用的是Object.is , Object.is比较对象的时候比较的是地址
+
+
+#### 2. toEqual(): 
+
+对象值比较，不比较地址， 会递归检查对象或数组
+
+##### 相反：not
+
+not.toBe(): 不是...
+
+匹配器前加not，表示否定
+
+
+#### 3. 其他值匹配null, undefined, boolean：
+
+> toBeNull 只匹配 null
+
+> toBeUndefined 只匹配 undefined
+
+> toBeDefined 与 toBeUndefined 相反（被定义过的）
+
+> toBeTruthy 匹配任何 if 语句为真
+
+> toBeFalsy 匹配任何 if 语句为假
+
+
+#### 4. 数字比较：
+
+> toBeGreaterThan(): >
+
+> toBeGreaterThanOrEqual(): >=
+
+> toBeLessThan(): <
+
+> toBeLessThanOrEqual: <=
+
+浮点数比较使用toBeCloseTo， 是否相等（接近）
+
+#### 5. 字符串匹配：toMatch
+
+可以使用toMatch去匹配正则
+
+```
+test('but there is a "stop" in Christoph', () => {
+  expect('Christoph').toMatch(/stop/);
+});
+
+```
+
+#### 6. 数组、对象包含： toContain
+
+```
+const shoppingList = [
+  'diapers',
+  'kleenex',
+  'beer',
+];
+
+test('the shopping list has beer on it', () => {
+  expect(shoppingList).toContain('beer');
+  expect(new Set(shoppingList)).toContain('beer');
+});
+
+```
+
+#### 7. 检测抛错信息： toThrow
+
+```
+function compileAndroidCode() {
+  throw new ConfigError('you are using the wrong JDK');
+}
+
+test('compiling android goes as expected', () => {
+  expect(compileAndroidCode).toThrow();
+  expect(compileAndroidCode).toThrow(ConfigError);
+
+  // You can also use the exact error message or a regexp
+  expect(compileAndroidCode).toThrow('you are using the wrong JDK');
+  expect(compileAndroidCode).toThrow(/JDK/);
+});
+
+```
+### 测试异步代码
+
+当你有以异步方式运行的代码时，Jest 需要知道当前它测试的代码是否已完成，然后它可以转移到另一个测试。
+
+正常情况下，一旦代码执行到末尾，测试就结束了，我们要控制这个情况，让他等待结果
+
+1. 使用done
+
+Jest会等done回调函数执行结束后，结束测试。
+
+```
+test('the data is peanut butter', done => {
+  function callback(data) {
+    expect(data).toBe('peanut butter');
+    done();
+  }
+
+  fetchData(callback);
+});
+
+```
+如果 done()永远不会调用，这个测试将失败。
+
+2. Promises
+
+如果您的代码使用 Promises，还有一个更简单的方法来处理异步测试。
+
+只需要从您的测试返回一个 Promise, Jest 会等待这一 Promise 完成。 如果reject，则测试将自动失败。
+
+```
+test('the data is peanut butter', () => {
+  return fetchData().then(data => {
+    expect(data).toBe('peanut butter');
+  });
+});
+```
+
+一定不要忘记把 promise 作为返回值
+
+
+如果你想要 Promise 被拒绝(想要一个失败的返回)，使用 .catch 方法。 请确保添加 expect.assertions 来验证一定数量的断言被调用。 否则一个fulfilled态的 Promise 不会让测试失败︰
+
+```
+test('the fetch fails with an error', () => {
+  expect.assertions(1);
+  return fetchData().catch(e => expect(e).toMatch('error'));
+});
+
+```
+
+> 报错（reject）的时候，会走catch, 但是如果正常返回,就不会走了，如果不加expect.assertions(1), 正常返回时，测试就通过了，这不符合 预期，所以得用两个条件判断
+
+3. Async/Await
+
+您可以在测试中使用 async 和 await。 若要编写 async 测试，只要在函数前面使用 async 关键字传递到 test
+
+```
+test('the data is peanut butter', async () => {
+  const data = await fetchData();
+  expect(data).toBe('peanut butter');
+});
+
+test('the fetch fails with an error', async () => {
+  expect.assertions(1);
+  try {
+    await fetchData();
+  } catch (e) {
+    expect(e).toMatch('error');
+  }
+});
+
+
+```
+
+###  钩子函数
+
+#### beforeEach 和 afterEach
+
+如果你有一些要为多次测试重复设置的工作，你可以使用 beforeEach 和 afterEach。
+
+```
+beforeEach(() => {
+  initializeCityDatabase();
+});
+
+afterEach(() => {
+  clearCityDatabase();
+});
+
+test('city database has Vienna', () => {
+  expect(isCity('Vienna')).toBeTruthy();
+});
+
+test('city database has San Juan', () => {
+  expect(isCity('San Juan')).toBeTruthy();
+});
+
+```
+#### beforeAll 和 afterAll
+
+在某些情况下，你只需要在文件的开头做一次设置。 当这种设置是异步行为时，可能非常恼人，你不太可能一行就解决它。 Jest 提供 beforeAll 和 afterAll 处理这种情况
+
+例如，如果 initializeCityDatabase 和 clearCityDatabase 都返回了 promise ，城市数据库可以在测试中重用，我们就能把我们的测试代码改成这样:
+
+```
+beforeAll(() => {
+  return initializeCityDatabase();
+});
+
+afterAll(() => {
+  return clearCityDatabase();
+});
+
+test('city database has Vienna', () => {
+  expect(isCity('Vienna')).toBeTruthy();
+});
+
+test('city database has San Juan', () => {
+  expect(isCity('San Juan')).toBeTruthy();
+});
+
+
+```
+
+### 作用域
+
+默认情况下，before 和 after 钩子函数可以应用到文件中的每个测试（所有test()...测试）。
+
+此外可以通过 describe 块来将测试分组。 当 before 和 after 的钩子函数在 describe 块内部时，则其只适用于该 describe 块内的测试。
+
+顺序：
+
+beforeAll
+
+beforeEach
+
+测试代码
+
+afterEach
+
+beforeAll
+
+descripe内部是，先自己的beforeAll， 再执行文件的beforeEach， 然后再是自己的beforeEach， test测试代码， 自己的afterEach, 文件的afterEach
+
+### desribe和test块的执行顺序
+
+Jest 会在所有真正的测试开始之前执行测试文件里所有的 describe 处理程序。这是我们要在 before* 和 after* 处理程序里面 （而不是在 describe 块中）进行准备工作和整理工作的另一个原因。
+
+当 describe 块运行完后,，默认情况下，Jest 会按照 test 出现的顺序，依次运行所有测试,，等待每一个测试完成并整理好，然后才继续往下走。
+
+
+### 单独运行一条测试
+
+如果测试失败，第一件要检查的事就是，当仅运行这条测试时，它是否仍然失败。 在 Jest 中很容易地只运行一个测试 — — 只需暂时将 test 命令更改为 test.only:
+> 似乎会，在当前文件中只运行，这条测试
+
+```
+test.only('this will be the only test that runs', () => {
+  expect(true).toBe(false);
+});
+
+test('this test will not run', () => {
+  expect('A').toBe('A');
+});
+
+
+```
+
+### it && test
+
+Jest中的test方法只是it的一个别名, it 一般要和describe连用， test可以单独用
+
+### 变更后自动重新运行测试
+
+更改测试文件，需要再次手动运行 npm test，这点令人沮丧。Jest 的最佳功能是在观察模式，它会观察文件的更改来运行测试。
+
+在观察模式下运行，可以运行 npm test -- --watch。在 npm test 之后，第一个 -- 之前，将命令直接传递给底层
+
+```
+npm test -- --watch
+
+jest --watch
+
+```
+
+
+
+### 模拟(函数)实现
+
+jest.fn
+
+mockImplementationOnce
+
+```
+const myMockFn = jest.fn(cb => cb(null, true));
+
+myMockFn((err, val) => console.log(val));
+// > true
+
+
+```
+
+当您需要定义从另一个模块创建的模拟函数的默认实现时，mockImplementation方法非常有用
+
+```
+// foo.js
+module.exports = function() {
+  // some implementation;
+};
+
+// test.js
+jest.mock('../foo'); // this happens automatically with automocking
+const foo = require('../foo');
+
+// foo is a mock function
+foo.mockImplementation(() => 42);
+foo();
+// > 42
+
+
+```
+
+模拟一个函数不同的实现
+
+```
+const myMockFn = jest
+  .fn()
+  .mockImplementationOnce(cb => cb(null, true))
+  .mockImplementationOnce(cb => cb(null, false));
+
+myMockFn((err, val) => console.log(val));
+// > true
+
+myMockFn((err, val) => console.log(val));
+// > false
+
+```
+
+Mock 名称
+
+```
+
+const myMockFn = jest
+  .fn()
+  .mockReturnValue('default')
+  .mockImplementation(scalar => 42 + scalar)
+  .mockName('add42');
+
+```
+
+### mock 函数扩展
+
+
+
+假设我们要测试函数 forEach 的内部实现，这个函数为传入的数组中的每个元素调用一次回调函数。
+
+```
+function forEach(items, callback) {
+  for (let index = 0; index < items.length; index++) {
+    callback(items[index]);
+  }
+}
+
+```
+
+为了测试此函数，我们可以使用一个 mock 函数，然后检查 mock 函数的状态来确保回调函数如期调用。
+
+```
+const mockCallback = jest.fn(x => 42 + x);
+forEach([0, 1], mockCallback);
+
+// 此 mock 函数被调用了两次
+expect(mockCallback.mock.calls.length).toBe(2);
+
+// 第一次调用函数时的第一个参数是 0
+expect(mockCallback.mock.calls[0][0]).toBe(0);
+
+// 第二次调用函数时的第一个参数是 1
+expect(mockCallback.mock.calls[1][0]).toBe(1);
+
+// 第一次函数调用的返回值是 42
+expect(mockCallback.mock.results[0].value).toBe(42);
+
+// 此函数的第一个实例化返回的对象
+// had a `name` property whose value was set to 'test'
+expect(someMockFunction.mock.instances[0].name).toEqual('test');
+
+```
+
+#### .mock 属性
+
+所有的 mock 函数都有这个特殊的 .mock属性，它保存了关于此函数如何被调用、调用时的返回值的信息。 .mock 属性还追踪每次调用时 this的值，所以我们同样可以也检视（inspect） this，需要是可以打印出来看看，方便调试
+
+
+#### Mock 的返回值
+
+模拟函数还可用于在测试期间向代码中注入测试值：
+
+```
+const myMock = jest.fn();
+console.log(myMock());
+// > undefined
+
+myMock
+  .mockReturnValueOnce(10)
+  .mockReturnValueOnce('x')
+  .mockReturnValue(true);
+
+console.log(myMock(), myMock(), myMock(), myMock());
+// > 10, 'x', true, true
+
+
+const filterTestFn = jest.fn();
+
+// Make the mock return `true` for the first call,
+// and `false` for the second call
+filterTestFn.mockReturnValueOnce(true).mockReturnValueOnce(false);
+
+const result = [11, 12].filter(filterTestFn);
+
+console.log(result);
+// > [11]
+console.log(filterTestFn.mock.calls);
+// > [ [11], [12] ]
+
+```
+
+### Mocking Modules 模拟模块
+
+三种写法
+
+> 1. jest.mock('xxx/xx.js');
+> 2. jest.mock('xxx/xx.js', () => {
+        ...  模块实现
+    return xx(导出模块名)
+);
+> 3. 见下2，写mock文件
+
+
+1. 库
+
+jest为axios的.get提供了mockResolvedValue函数，来模拟返回值
+
+```
+// users.test.js
+import axios from 'axios';
+import Users from './users';
+
+jest.mock('axios');
+
+test('should fetch users', () => {
+  const users = [{name: 'Bob'}];
+  const resp = {data: users};
+  axios.get.mockResolvedValue(resp);
+
+  // or you could use the following depending on your use case:
+  // axios.get.mockImplementation(() => Promise.resolve(resp))
+
+  return Users.all().then(data => expect(data).toEqual(users));
+});
+
+```
+
+2. 模拟模块或其中部分导出
+
+
+
+> 1. 在要引入的文件的同级目录，建__mocks__目录，在__mocks__下建，同名文件,实现需要的方法并导出
+> 2. 在测试文件里，声明要mock的模块，jest.mock('/demo')
+> 3. 然后测试文件引入对应文件(及其依赖文件)的时候，就会去相应同级__mocks__下找
+> 4. 可以用jest.unmock('/demo')取消相应mock，
+> 5. 如果在配置里有automock为true, 则不需要声明jest.mock(...),会自动寻找有没有__mocks__目录，如果有则使用__mocks__下的文件
+> 6. 如果有一些导出的函数不需要mock,要使用真实文件里的，则可以用`const {} = jest.requireActual(...)`
+> 7. 被模拟的模块会自带mock属性
+
+
+
+
+```
+// 这个 mock 函数至少被调用一次
+expect(mockFunc).toBeCalled();
+
+// 这个 mock 函数至少被调用一次，而且传入了特定参数
+expect(mockFunc).toBeCalledWith(arg1, arg2);
+
+// 这个 mock 函数的最后一次调用传入了特定参数
+expect(mockFunc).lastCalledWith(arg1, arg2);
+
+// 所有的 mock 的调用和名称都被写入了快照
+expect(mockFunc).toMatchSnapshot();
+
+
+```
+
+### Snapshot 快照
+
+toMatchSnapshot()
+
+src\routes\carousel\utils
+
+多用于测试配置文件（返回对象之类的），第一次运行会新建__snapshots__文件夹，并生成快照，以后再运行会生成快照并和第一次的比较，如果不同则报错，如果要改配置文件，在报错提示后，
+在选项中选择u，更新(全部)快照就好，如果更新了多个快照，可以一个个确认更改，选择i, 确认后再一个个按u更新, 按s跳过
+
+可以使用传入配置项对一些独特项做断言，比如 某一项值为 `new Date()`,设置为任意Date类型就好
+
+```
+test('。。。', () => {
+  expect(consfig()).toMatchSnapshot({
+    time: expect.any(Date)
+  })
+});
+```
+
+#### 行内快照
+
+如果不想单独生成快照文件，可以使用行内快照，不过得装包：prettier ， 可以装1.18.2版本
+
+这样，运行后会，在第二个参数里自动注入快照，对象
+
+```
+test('。。。', () => {
+  expect(consfig()).toMatchInlineSnapshot({
+    time: expect.any(Date)
+  })
+});
+```
+
+
+
+## Enzyme
+
+[link](https://github.com/airbnb/enzyme)
+
+jest 在node环境下自己模拟了一套js，dom 的 api， jsDom , 可以搭配jquery来测试，但不是很方便。
+
+Enzyme是由airbnb开发的React组件测试工具。它扩展了React的TestUtils并通过支持类似jQuery的find语法可以很方便的对render出来的结果做各种断言。也是react官方推荐的测试类库
+
+Enzyme兼容大多数断言库和测试框架，如chai、mocha、jasmine等。
+
+### 配置
+
+使用Enzyme来测试react,您将需要安装Enzyme以及与您正在使用的react版本对应的适配器
+
+比如使用react 16版本
+```
+npm i --save-dev enzyme enzyme-adapter-react-16
+
+```
+
+
+如果配合jest使用，你需要运行安装文件（jest 里 setupFiles 配置的路径
+），使用Jest配置Enzyme和适配器；
+
+```
+// setup.js
+
+
+import Enzyme from 'enzyme';
+import Adapter from 'enzyme-adapter-react-16';
+
+Enzyme.configure({ adapter: new Adapter() });
+
+```
+
+### 基本用法
+
+```
+import React from 'react';  // 需要引入react ，解析jsx语法
+import { expect } from 'chai';
+import { shallow } from 'enzyme';
+import sinon from 'sinon';
+
+import MyComponent from './MyComponent';
+import Foo from './Foo';
+
+describe('<MyComponent />', () => {
+  it('renders three <Foo /> components', () => {
+    const wrapper = shallow(<MyComponent />);
+    expect(wrapper.find(Foo)).to.have.lengthOf(3);
+  });
+
+  it('renders an `.icon-star`', () => {
+    const wrapper = shallow(<MyComponent />);
+    expect(wrapper.find('.icon-star')).to.have.lengthOf(1);
+  });
+
+  it('renders children when passed in', () => {
+    const wrapper = shallow((
+      <MyComponent>
+        <div className="unique" />
+      </MyComponent>
+    ));
+    expect(wrapper.contains(<div className="unique" />)).to.equal(true);
+  });
+
+  it('simulates click events', () => {
+    const onButtonClick = sinon.spy();
+    const wrapper = shallow(<Foo onButtonClick={onButtonClick} />);
+    wrapper.find('button').simulate('click');
+    expect(onButtonClick).to.have.property('callCount', 1);
+  });
+});
+
+```
+
+### api
+
+### expect
+
+期待
+
+### toHaveBeenCalled
+
+被调用
+
+## 三种渲染方式
+
+### shallow
+
+shallow(node[, options]) => ShallowWrapper
+
+浅渲染，只渲染当前组件第一层，渲染速度快，适用于只对当前组件做单元测试，返回ShallowWrapper实例
+
+### render
+
+静态渲染，它将React组件渲染成静态的HTML字符串，然后使用Cheerio这个库解析这段字符串，并返回一个Cheerio的实例对象，可以用来分析组件的html结构。使用较少
+
+### mount
+
+挂载,完全渲染，它将组件渲染加载成一个真实的DOM节点，用来测试DOM API的交互和组件的生命周期，用到了jsdom来模拟浏览器环境。适用于集成测试,e2e测试
+
+
+
+#### Wrapper 常用api：
+
+> instance()
+
+返回测试组件实例
+
+> .simulate(event[, data]) => ShallowWrapper
+
+在当前节点触发事件，data就是给事件函数的传参，会与事件默认传参合并， 事件名小写
+
+> state()
+
+获取状态
+
+> .setState(nextState) => ShallowWrapper
+
+设置状态
+
+> text()
+
+文本
+
+> .find(selector) => ShallowWrapper
+
+找到呈现树中与提供的选择器匹配的每个节点。selector也可以是react组件名
+
+
+> .prop(key) => Any
+
+返回当前节点的指定属性
+
+> .name() => String
+
+返回包装器当前节点的名称，可以是react组件名
+
+> .at(index) => ShallowWrapper
+
+在提供的当前包装器索引处返回节点的包装器。
+
+> .debug()
+
+调试用，返回实际渲染出的html字符串
+
+> .dive()
+
+用了一个装饰器就配一个dive(),这样才能取到实例上的方法。
+
+含义是浅渲染，返回当前wrapper的子元素的wrapper
+
+wrapper.dive().instance()
+
+### 其他api
+
+> .findWhere(predicate) => ShallowWrapper
+
+查找呈现树中为提供的谓词函数返回true的每个节点。
+
+> .update() => ShallowWrapper
+
+setState后不会自动更新组件，可以调用update更新
+
+
+> .contains(nodeOrNodes) => Boolean
+
+返回给定节点或节点数组是否位于呈现树中的某个位置。
+
+> .exists([selector]) => Boolean
+
+返回当前节点是否存在，或者，如果给定选择器，该选择器是否具有匹配结果。
+
+> setProps(nextProps)
+
+设置根组件的属性；
+
+...
+
+#### 调试
+
+`console.log(wrapper.debug())`
+
+### 代码解耦
+
+> 比如用类名来找到的元素，后期改类名，会导致测试无法通过
+
+加针对测试的属性 : data-test='xxx'
+
+```
+expect(wrapper.find('[data-test="container"]').length).toBe(1)
+
+
+```
+
+## 额外补充
+
+
+### 事件思路
+
+事件触发后：
+
+>1. 事件函数触发，传入的属性函数（如果需要的话）会被调用
+>3. 如果改变状态（setState），这里是同步的，可以直接在下一步测到状态，但是组件并没有改变
+>3. 如果事件会涉及到有关组件的属性值改变，得重新获取该元素再测试
+
+
+### 状态写入
+
+我们的组件常与redux连用，请求数据保存在里面，在测试的时候，可能因为缺少数据而报错，
+这时候可能需要我们通过store，创建一些数据穿进去
+
+src\routes\carousel\components\SearchCity\index.test.js
+
+```
+import React from 'react';
+import { createStore } from 'redux';
+import { shallow, mount } from 'enzyme';
+import SearchCity from './index';
+
+
+describe('SearchCity', () => {
+  const reducer = (state = { carousel: {} }, action) => {
+    switch (action.type) {
+      case 'INCREMENT':
+        return state + 1;
+      default:
+        return state;
+    }
+  };
+  const store = createStore(reducer);
+  test('handleChange', () => {
+    const onSearch = jest.fn();
+    const onChange = jest.fn();
+    const wrapperTop = shallow(
+      <SearchCity onSearch={onSearch} onChange={onChange} store={store} />
+    );
+    const wrapperInner = wrapperTop.dive();
+    const ins = wrapperInner.dive().instance();
+    ins.handleSearch();
+    ins.handleChange('e');
+    expect(onSearch).toHaveBeenCalled();
+    expect(onChange).toHaveBeenCalledWith('e');
+  });
+
+
+  test('渲染', () => {
+    const options = [
+      'City',
+      'Typesof',
+      'Status',
+      'Search',
+    ];
+    const wrapper = mount(<SearchCity options={options} store={store} />);
+    expect(wrapper.find('SearchCity').length).toBe(1);
+  });
+});
+
+```
+
+
+### vue
+
+[link](https://note.youdao.com/)
+
+Vue Test Utils 是 Vue.js 官方的单元测试实用工具库。  类似  enzyme 
